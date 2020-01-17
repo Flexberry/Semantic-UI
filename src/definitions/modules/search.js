@@ -54,6 +54,8 @@ $.fn.search = function(parameters) {
         element         = this,
         instance        = $module.data(moduleNamespace),
 
+        disabledBubbled = false,
+
         module
       ;
 
@@ -147,8 +149,13 @@ $.fn.search = function(parameters) {
             if(module.resultsClicked) {
               module.debug('Determining if user action caused search to close');
               $module
-                .one('click', selector.results, function(event) {
-                  if( !module.is.animating() && !module.is.hidden() ) {
+              .one('click.close' + eventNamespace, selector.results, function(event) {
+                if(module.is.inMessage(event) || disabledBubbled) {
+                  $prompt.focus();
+                  return;
+                }
+                disabledBubbled = false;
+                if( !module.is.animating() && !module.is.hidden()) {
                     callback();
                   }
                 })
@@ -186,6 +193,7 @@ $.fn.search = function(parameters) {
               if( $.isFunction(settings.onSelect) ) {
                 if(settings.onSelect.call(element, result, results) === false) {
                   module.debug('Custom onSelect callback cancelled default select action');
+                  disabledBubbled = true;
                   return;
                 }
               }
@@ -320,6 +328,9 @@ $.fn.search = function(parameters) {
           },
           hidden: function() {
             return $results.hasClass(className.hidden);
+          },
+          inMessage: function(event) {
+            return (event.target && $(event.target).closest(selector.message).length > 0);
           },
           empty: function() {
             return ($results.html() === '');
@@ -1181,6 +1192,7 @@ $.fn.search.settings = {
     prompt       : '.prompt',
     searchButton : '.search.button',
     results      : '.results',
+    message      : '.results > .message',
     category     : '.category',
     result       : '.result',
     title        : '.title, .name'
