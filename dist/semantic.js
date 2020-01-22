@@ -2070,8 +2070,6 @@ $.fn.accordion = function(parameters) {
 
         element  = this,
         instance = $module.data(moduleNamespace),
-
-        disabledBubbled = false,
         observer,
         module
       ;
@@ -12339,6 +12337,8 @@ $.fn.search = function(parameters) {
 
         element         = this,
         instance        = $module.data(moduleNamespace),
+
+        disabledBubbled = false,
 
         module
       ;
